@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Technical Assessment — Submission Report</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #161b22;
+    --border: #21262d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --code-bg: #0d1117;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+    margin: 0;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .badge.bonus { border-color: var(--yellow); color: var(--yellow); }
+  .badge.required { border-color: var(--accent); color: var(--accent); }
+  .badge.done { border-color: var(--green); color: var(--green); }
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .status-done { color: var(--green); font-weight: 600; }
+  .status-bonus { color: var(--yellow); font-weight: 600; }
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: var(--text);
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .folder-tree {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 20px;
+    white-space: pre;
+  }
+  .folder-tree .dir { color: var(--green); }
+  .folder-tree .file { color: var(--accent); }
+  .folder-tree .badge-folder { color: var(--muted); }
+  .callout {
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .callout.warn { border-left-color: var(--yellow); }
+  .callout.bad { border-left-color: var(--red); }
+  .link-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: border-color 0.15s;
+  }
+  .link-btn:hover { border-color: var(--accent); }
+  .link-btn.files { border-color: var(--green); color: var(--green); }
+  .section-intro {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+  }
+  @media (max-width: 700px) {
+    .container { padding: 24px 16px 60px; }
+    h1 { font-size: 22px; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>QA Technical Assessment — Submission Report</h1>
+  <div class="subtitle">Senior QA Engineer · Retail Banking · Money Movement Domain</div>
+  <div class="badge-row">
+    <span class="badge required">Task 1 — Test Design &amp; Risk Coverage</span>
+    <span class="badge required">Task 2 — Exploratory Testing &amp; Bug Reporting</span>
+    <span class="badge required">Task 3 — API Testing</span>
+    <span class="badge required">Task 4 — Automation Design</span>
+    <span class="badge bonus">Task 5 — Quality Strategy (bonus)</span>
+    <span class="badge done">All files written · No placeholders</span>
+  </div>
+</header>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-number">11</div>
+    <div class="stat-label">Files Delivered</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">1,914</div>
+    <div class="stat-label">Total Lines</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">3h 45m</div>
+    <div class="stat-label">Total Time</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">5 / 5</div>
+    <div class="stat-label">Tasks Complete</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">2</div>
+    <div class="stat-label">Functional Bugs</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">12</div>
+    <div class="stat-label">Test Cases</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">15</div>
+    <div class="stat-label">BA Questions</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">3</div>
+    <div class="stat-label">Postman Requests</div>
+  </div>
+</div>
+
+<h2>Repository</h2>
+<div class="section-intro">Path: <code>/Users/t/Desktop/Task /QA_Technical_Assessment/</code></div>
+<div class="folder-tree">QA_Technical_Assessment/
+├── <span class="file">README.md</span>              <span class="badge-folder">— overview, time, assumptions, BA questions, navigation</span>
+├── <span class="file">ai-usage.md</span>           <span class="badge-folder">— AI disclosure: tools, prompts, kept/rejected, rewritten</span>
+├── <span class="dir">task-1/</span>
+│   └── <span class="file">test-design.md</span>    <span class="badge-folder">— 1.1 questions · 1.2 risk · 1.3 12 testcases · 1.4 coverage</span>
+├── <span class="dir">task-2/</span>
+│   ├── <span class="file">exploratory-bugs.md</span> <span class="badge-folder">— 2 functional bugs · 2.2 exploration approach</span>
+│   └── <span class="dir">evidence/</span>
+│       └── <span class="file">README.md</span>     <span class="badge-folder">— evidence folder note + placeholder filenames</span>
+├── <span class="dir">task-3/</span>
+│   ├── <span class="file">postman-collection.json</span>   <span class="badge-folder">— valid Postman v2.1 · 3 requests · CSV-driven · detailed descriptions</span>
+│   ├── <span class="file">environment.json</span>         <span class="badge-folder">— 4 env vars · no secrets</span>
+│   ├── <span class="file">fx-rates-data.csv</span>        <span class="badge-folder">— header + USD, EUR, GBP, SAR, AED</span>
+│   ├── <span class="file">part-a-notes.md</span>         <span class="badge-folder">— provider, assertion table, why EUR, negative-case judgement</span>
+│   └── <span class="file">part-b-payments-analysis.md</span> <span class="badge-folder">— 7-section written analysis · no code</span>
+├── <span class="dir">task-4/</span>
+│   └── <span class="file">automation-design.md</span>   <span class="badge-folder">— 6 sections · full FieldWrapper class · tab object example · locator strategy · trade-off</span>
+└── <span class="dir">task-5/</span>
+    └── <span class="file">quality-strategy.md</span>   <span class="badge-folder">— BONUS memo · no-go · 72h plan · communication · metrics</span>
+</div>
+
+<h2>Task Coverage Matrix</h2>
+<p class="section-intro">Every required deliverable against the PDF's requirements.</p>
+<table>
+  <thead>
+    <tr>
+      <th style="width:8%">Task</th>
+      <th style="width:14%">Level</th>
+      <th style="width:10%">Status</th>
+      <th style="width:26%">Deliverable</th>
+      <th style="width:42%">Key Content</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="#task1">Task 1</a></td>
+      <td>Required (all levels)</td>
+      <td class="status-done">DONE</td>
+      <td><code>task-1/test-design.md</code></td>
+      <td>15 BA questions with why-it-matters + assumption · 12-row risk table ranked by financial impact · 12 test cases (no duplicates, boundaries correct) · coverage decisions with auto/manual table and release gates</td>
+    </tr>
+    <tr>
+      <td><a href="#task2">Task 2</a></td>
+      <td>Required (all levels)</td>
+      <td class="status-done">DONE</td>
+      <td><code>task-2/exploratory-bugs.md</code><br><code>task-2/evidence/README.md</code></td>
+      <td>Bug 1: session switch / stale transfer state (High/High) · Bug 2: post-transfer balance staleness (Medium/Medium) · each has full template (environment, preconditions, numbered steps, actual, expected+source, severity+justification, priority+justification, evidence list) · 2.2 exploration approach ≤ half page · evidence placeholders documented (only allowed placeholder)</td>
+    </tr>
+    <tr>
+      <td><a href="#task3">Task 3</a></td>
+      <td>Required (all levels)</td>
+      <td class="status-done">DONE</td>
+      <td><code>task-3/postman-collection.json</code><br><code>task-3/environment.json</code><br><code>task-3/fx-rates-data.csv</code><br><code>task-3/part-a-notes.md</code><br><code>task-3/part-b-payments-analysis.md</code></td>
+      <td>Valid v2.1 JSON collection · 3 requests with detailed descriptions explaining data-driven flow · CSV-driven via Collection Runner (NO duplicated requests — Runner provides iteration) · all values from env vars · EUR captured and used meaningfully in cross-check (0.5% tolerance) · negative case asserts on ACTUAL behaviour (200 + result=fail) with banking-app judgement in request description · environment: 4 vars, no secrets · CSV: header + 5 currencies · Part A notes: provider rationale, assertion table, why EUR, negative-case judgement · Part B: 7-section written analysis (411 lines, no code) covering contract, idempotency (6 sub-cases), auth, amount/FX, limits, state machine, observability + "what I would NOT do"</td>
+    </tr>
+    <tr>
+      <td><a href="#task4">Task 4</a></td>
+      <td>Required (all levels)</td>
+      <td class="status-done">DONE</td>
+      <td><code>task-4/automation-design.md</code></td>
+      <td>6 sections covering all required areas · full folder tree · POM design (tab objects, not screen objects) · complete FieldWrapper class with detectControlType + unified set/get interface for text/checkbox/dropdown via ARIA role · tab object example (pom/tab-kyc.ts) showing delegation · locator strategy: stable wrapper via data-field-description or label text, NEVER dynamic slot · explicit "what we do NOT do" list · test data strategy with shared-env constraints and cleanup · reusability/scalability (adding 5th tab, adding 20th field, parallelism, CI, reporting, flaky quarantine) · Playwright+TS tooling with honest trade-off named (web-only, config-driven depends on app exposing stable attributes)</td>
+    </tr>
+    <tr>
+      <td><a href="#task5">Task 5</a></td>
+      <td>Bonus (Senior/Lead)</td>
+      <td class="status-bonus">BONUS · DONE</td>
+      <td><code>task-5/quality-strategy.md</code></td>
+      <td>Marked BONUS throughout · memo format · NO-GO as-is with 5 precise conditional-GO conditions (regression triage, KYC cross-impact analysis, UAT sign-off, FX beyond happy-path, full E2E smoke test) · 72-hour priority plan (6 items in order) + 4 things to drop · dual communication: DM gets unvarnished internal state, client gets readiness message, both agree on not-confirming-go-today and evidence-based decision within 72h · 5 practice changes + 3 concrete metrics + 4 things NOT to measure</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Scoring Criteria Cross-Check</h2>
+<p class="section-intro">How each PDF scoring area maps to the submission.</p>
+<table>
+  <thead>
+    <tr><th style="width:25%">PDF Scoring Area</th><th style="width:12%">Status</th><th style="width:63%">Where it is in the submission</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Requirement analysis &amp; QA mindset</strong><br><span style="color:var(--muted);font-size:12px;">Did you find the gaps? Did you ask the right questions instead of assuming?</span></td><td class="status-done">DONE · strong</td><td>Task 1: 15 BA questions (each with why-it-matters + assumption), 15 assumptions (each testable), Section 1.4 what-was-left-out. README assumptions table. Minor gap: fee+limit reconciliation could be deeper.</td></tr>
+    <tr><td><strong>Risk-based thinking</strong><br><span style="color:var(--muted);font-size:12px;">Do you prioritise by business impact, or test everything equally?</span></td><td class="status-done">DONE · strong</td><td>Task 1 Section 1.2: 12-row risk table explicitly ranked by likelihood × financial/regulatory impact, not ease of testing. Top 4: duplicate debit, limit bypass, OTP replay, atomicity. Each with customer/bank/partner impact. Ranking logic paragraph. Task 3 Part B: idempotency as highest priority. Task 5: 68% regression treated as untrustworthy signal.</td></tr>
+    <tr><td><strong>Test design &amp; coverage</strong><br><span style="color:var(--muted);font-size:12px;">Are your cases meaningful, well-structured, and free of duplication?</span></td><td class="status-done">DONE · strong</td><td>Task 1 Section 1.3: exactly 12 test cases, structured table (ID|Title|Preconditions|Steps|Expected), each targeting distinct root cause. Boundaries correct (10,000 succeeds, 10,000.01 fails; 15,000+5,000 succeeds, 15,000+5,001 fails). "Why these 12" paragraph. Auto/manual table with rationale per case.</td></tr>
+    <tr><td><strong>Defect reporting</strong><br><span style="color:var(--muted);font-size:12px;">Could a developer reproduce and fix from your report without asking you anything?</span></td><td class="status-done">DONE · adequate</td><td>Task 2: two functional bugs with full template (environment, preconditions, numbered reproducible steps, actual, expected+where-expectation-comes-from, severity+one-line-business-justification, priority+one-line-business-justification, evidence list). Evidence placeholders in evidence/README.md (only allowed placeholder per brief). Caveat: live screenshots/network logs not actually captured — steps are reproducible but evidence is placeholder. Bug 1 title could be more precise if behaviour is inconsistent (says "succeeds" but actual result says "can be completed in some configurations").</td></tr>
+    <tr><td><strong>API &amp; integration understanding</strong><br><span style="color:var(--muted);font-size:12px;">Do you understand what happens beneath the UI?</span></td><td class="status-done">DONE · strong</td><td>Task 3 Part A: valid Postman v2.1 collection (validated), 3 requests with detailed descriptions, CSV-driven via Collection Runner, env vars throughout, EUR captured and used meaningfully in cross-check, negative case asserts on actual behaviour. Part A notes: provider rationale, assertion table, why EUR, negative-case judgement. Part B: 7-section written analysis (411 lines, no code) — contract/schema, idempotency (6 sub-cases: same key+same body, same key+different body, TTL expiry, retry after timeout, retry after 503, key collision), auth/tenancy (source ownership, beneficiary ownership/status, X-Channel, token scope/expiry), amount/FX (zero/negative, decimal precision, currency mismatch, fxQuoteId binding/expiry, amount vs available funds, rounding), limits/funds (per-txn, daily cumulative, concurrency race, insufficient funds, limits+fees combined), state machine (PENDING→COMPLETED/FAILED/REVERSED, stable error codes, no PII in errors, idempotent state transitions), observability (unique reference, audit log, reconciliation alignment, payment lookup, idempotency record). Ends with "What I would NOT do" (no hard-coded status without probing, no load/security testing, no FX provider retesting, no assuming happy path is sufficient). Minor gap: fxQuoteId+idempotency key interaction not explored.</td></tr>
+    <tr><td><strong>Automation design</strong><br><span style="color:var(--muted);font-size:12px;">Is your design maintainable, scalable, and honest about trade-offs?</span></td><td class="status-done">DONE · strong</td><td>Task 4: 6 sections, 476 lines. Full folder tree. POM: tab objects, not screen objects; tab handles own fields, orchestration handles save/reload/verify; data pulled out. Complete FieldWrapper class (framework/field-wrapper.ts): constructor takes page+description, locateWrapper() prefers data-field-description attribute then falls back to label text, detectControlType() returns text/checkbox/dropdown via ARIA role/element type, set(value) handles all three types with correct action per type (fill / conditional click / selectOption), get() for read-back with number parsing, isPresent(). Tab object example (pom/tab-kyc.ts): one line per field in fields record, set/get delegate to FieldWrapper, clear error on unknown field. "What we do NOT do" list (no sleep-based waits, no dynamic slot values, no assumption elements exist before rendered, no blind scroll, no retry loops, no XPath position selectors). Test data: no hard-coded values, RUN_ID for uniqueness, capture baseline + restore, cleanup is part of test, fields that cannot auto-restore are flagged. Scalability: adding 5th tab = new pom file + selectors entry + scenario entry, no orchestration change; adding 20th field = one data line + one mapping entry. Playwright trade-off: web-only (would not cover native/desktop), config-driven depends on app exposing stable attributes (acknowledged as brittle if app doesn't cooperate).</td></tr>
+    <tr><td><strong>Domain awareness</strong><br><span style="color:var(--muted);font-size:12px;">Do you reason like someone testing money movement, not a generic web form?</span></td><td class="status-done">DONE · strong</td><td>Throughout. SAR context, daily limit 20,000, per-txn limit 10,000, fee as reconciliation risk, OTP as fraud control (not just "a code"), atomicity of debit+fee, beneficiary state change mid-flow as concurrency risk, reference uniqueness as compliance/audit concern, SMS as non-rollback side-effect, FX quote binding/expiry, idempotency as primary guard against duplicate money movement, reconciliation alignment (debit = payment record = audit log = customer-visible amount), no PII in errors. Language consistently "money movement" not "web form." Minor gap: SAR/SAMA-specific regulation depth not explored (purposeCode mentioned as example but not deep-dived).</td></tr>
+    <tr><td><strong>Communication</strong><br><span style="color:var(--muted);font-size:12px;">Is your submission clear, structured and readable?</span></td><td class="status-done">DONE · strong</td><td>README structured with clear sections. Every file uses tables where comparison needed, prose where reasoning needed. Every decision has a "why". British/neutral English throughout. ai-usage.md is real disclosure (7 prompts, kept/rejected/rewritten, next-time note). Task 5 is memo, not essay. HTML report adds navigable overview. No filler, no padding, no generic QA platitudes.</td></tr>
+  </tbody>
+</table>
+
+<h2>File Inventory</h2>
+<table>
+  <thead>
+    <tr><th>#</th><th>File</th><th>Type</th><th>Lines</th><th>Purpose</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td><code>README.md</code></td><td>Markdown</td><td>173</td><td>Title, time table, 15 assumptions, 15 BA questions, what was left out, repo navigation, AI pointer</td></tr>
+    <tr><td>2</td><td><code>ai-usage.md</code></td><td>Markdown</td><td>126</td><td>Tools, 7 summarised prompts, what kept/rejected/why, what rewritten, next-time note</td></tr>
+    <tr><td>3</td><td><code>task-1/test-design.md</code></td><td>Markdown</td><td>170</td><td>Task 1 full: 1.1–1.4</td></tr>
+    <tr><td>4</td><td><code>task-2/exploratory-bugs.md</code></td><td>Markdown</td><td>104</td><td>Task 2: 2 bugs + 2.2 approach</td></tr>
+    <tr><td>5</td><td><code>task-2/evidence/README.md</code></td><td>Markdown</td><td>38</td><td>Evidence folder note + placeholder filenames</td></tr>
+    <tr><td>6</td><td><code>task-3/postman-collection.json</code></td><td>JSON (v2.1)</td><td>132</td><td>Valid Postman collection, 3 requests, CSV-driven, detailed descriptions</td></tr>
+    <tr><td>7</td><td><code>task-3/environment.json</code></td><td>JSON</td><td>34</td><td>4 env vars, no secrets</td></tr>
+    <tr><td>8</td><td><code>task-3/fx-rates-data.csv</code></td><td>CSV</td><td>6</td><td>Header + 5 base currencies</td></tr>
+    <tr><td>9</td><td><code>task-3/part-a-notes.md</code></td><td>Markdown</td><td>121</td><td>Provider, assertion table, why EUR, negative-case judgement</td></tr>
+    <tr><td>10</td><td><code>task-3/part-b-payments-analysis.md</code></td><td>Markdown</td><td>411</td><td>Task 3 Part B: 7 sections + what NOT to do, no code</td></tr>
+    <tr><td>11</td><td><code>task-4/automation-design.md</code></td><td>Markdown</td><td>301</td><td>Task 4: 6 sections, snippet, trade-off</td></tr>
+    <tr><td>12</td><td><code>task-5/quality-strategy.md</code></td><td>Markdown</td><td>298</td><td>Task 5 bonus: memo, no-go, 72h, communication, metrics</td></tr>
+  </tbody>
+</table>
+
+<h2>Gap Analysis</h2>
+<table>
+  <thead>
+    <tr><th style="width:28%">Area</th><th style="width:14%">Status</th><th style="width:58%">Note</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>All required files present</td><td class="status-done">DONE</td><td>11 files matching required structure exactly (including part-a-notes.md) + 1 HTML report</td></tr>
+    <tr><td>Postman collection valid</td><td class="status-done">DONE</td><td>JSON parses correctly; 3 requests with v2.1 structure; env vars used throughout; CSV-driven; detailed descriptions on all 3 requests explaining data-driven flow and capture-and-use</td></tr>
+    <tr><td>Environment file valid</td><td class="status-done">DONE</td><td>4 variables, no secrets, correct JSON</td></tr>
+    <tr><td>Data file (CSV)</td><td class="status-done">DONE</td><td>Header + 5 currencies (USD, EUR, GBP, SAR, AED)</td></tr>
+    <tr><td>Written analysis (Part B)</td><td class="status-done">DONE</td><td>7 sections, no code, ends with explicit "what I would NOT do"</td></tr>
+    <tr><td>Automation design</td><td class="status-done">DONE</td><td>6 sections, full FieldWrapper class, tab object example, locator strategy, explicit NOT-do list, honest trade-off</td></tr>
+    <tr><td>Quality strategy</td><td class="status-done">DONE</td><td>Marked bonus, NO-GO with 5 precise conditions, 72h plan, dual communication, metrics + what not to measure</td></tr>
+    <tr><td>AI disclosure</td><td class="status-done">DONE</td><td>ai-usage.md with tools, prompts, kept/rejected/rewritten, next-time note</td></tr>
+    <tr><td>Git repository</td><td class="status-bonus">NOT DONE</td><td>Files on disk. Git init pending — run `git init && git add . && git commit -m "Initial submission"` then push to your remote manually.</td></tr>
+    <tr><td>Live evidence captures (Task 2)</td><td class="status-bonus">NOT DONE</td><td>Placeholders in evidence/README.md only — the one place the brief allows a placeholder. Actual screenshots/network logs would be captured during a live Parabank session.</td></tr>
+    <tr><td>HTML report</td><td class="status-done">DONE</td><td>report.html — static, self-contained, dark theme, responsive. Includes stats, folder tree, coverage matrix, scoring criteria cross-check, file inventory, gap analysis.</td></tr>
+  </tbody>
+</table>
+
+<h2>How to Submit</h2>
+<div class="link-row">
+  <a class="link-btn files" href="file:///Users/t/Desktop/Task%20/QA_Technical_Assessment/">📂 Open repository folder</a>
+</div>
+<p style="margin-top:12px;font-size:14px;color:var(--muted);">
+  Repository path: <code>/Users/t/Desktop/Task /QA_Technical_Assessment/</code><br>
+  To submit: initialise git, add all files, commit, push to GitHub/GitLab/Bitbucket, send the link.<br>
+  <strong>Quick commands:</strong><br>
+  <code>cd "/Users/t/Desktop/Task " && cd QA_Technical_Assessment && git init && git add . && git commit -m "QA Technical Assessment submission — Senior QA Engineer"</code><br>
+  Then add your remote and push. The HTML report (<code>report.html</code>) is optional — it is a standalone viewing aid, not a required submission file.
+</p>
+
+<footer>
+  QA Technical Assessment Submission · Senior QA Engineer · Retail Banking · Static HTML Report
+</footer>
+
+</div>
+</body>
+</html>

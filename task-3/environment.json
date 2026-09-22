@@ -1,0 +1,34 @@
+{
+  "id": "6c4d2e1f-9a8b-4c3d-8e7f-1a2b3c4d5e6f",
+  "name": "FX Rates Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "https://open.er-api.com",
+      "type": "text",
+      "enabled": true,
+      "description": "Base URL for the FX rates provider. Switch to https://api.frankfurter.app if open.er-api.com is unavailable."
+    },
+    {
+      "key": "baseCurrency",
+      "value": "USD",
+      "type": "text",
+      "enabled": true,
+      "description": "Base currency for the current run. Set by the Collection Runner from fx-rates-data.csv, or overridden manually for a single request."
+    },
+    {
+      "key": "usdToEur",
+      "value": "",
+      "type": "text",
+      "enabled": true,
+      "description": "Captured rate: how many EUR one USD buys. Set by the first request (GET base currency) and consumed by the EUR cross-check request. Empty before the first request runs."
+    },
+    {
+      "key": "ratesTimestamp",
+      "value": "",
+      "type": "text",
+      "enabled": true,
+      "description": "Unix timestamp of the last rate update, captured from time_last_update_unix in the response. Used for audit and freshness checks."
+    }
+  ]
+}
