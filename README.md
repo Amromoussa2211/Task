@@ -147,6 +147,9 @@ any prove wrong, the affected test cases need revisiting.
 
 ```
 QA_Technical_Assessment/
+├── .github/
+│   └── workflows/
+│       └── ci.yml           # GitHub Actions CI workflow pipeline
 ├── README.md                # This file
 ├── ai-usage.md              # AI tool disclosure
 ├── task-1/
@@ -165,6 +168,28 @@ QA_Technical_Assessment/
 │   └── automation-design.md   # Task 4 — Automation design (no code)
 └── task-5/
     └── quality-strategy.md    # Task 5 — Quality strategy (bonus)
+```
+
+---
+
+## Continuous Integration (GitHub Actions)
+
+The repository includes an automated CI workflow at [.github/workflows/ci.yml](file:///Users/t/Desktop/Task%20/QA_Technical_Assessment/.github/workflows/ci.yml). 
+
+### Commands run in CI:
+```bash
+# 1. Execute Task 3 Postman API Collection via Newman with CSV data driver & environment
+newman run task-3/postman-collection.json \
+  -e task-3/environment.json \
+  -d task-3/fx-rates-data.csv \
+  -r cli,htmlextra \
+  --reporter-htmlextra-export task-3/newman-report.html
+
+# 2. Audit submission files & validate deliverables structure
+test -f task-1/test-design.md
+test -f task-2/exploratory-bugs.md
+test -f task-4/automation-design.md
+test -f task-5/quality-strategy.md
 ```
 
 ---

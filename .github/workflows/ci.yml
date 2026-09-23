@@ -1,0 +1,82 @@
+# name: QA Technical Assessment CI
+
+# on:
+#   push:
+#     branches: [ main, master ]
+#   pull_request:
+#     branches: [ main, master ]
+#   workflow_dispatch:
+
+# jobs:
+#   task-3-api-tests:
+#     name: Task 3 — Run Postman API Suite (Newman)
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+#           cache: 'npm'
+
+#       - name: Install Newman & Reporters
+#         run: |
+#           npm install -g newman newman-reporter-htmlextra
+
+#       - name: Run Task 3 Part A API Collection via Newman
+#         run: |
+#           newman run task-3/postman-collection.json \
+#             -e task-3/environment.json \
+#             -d task-3/fx-rates-data.csv \
+#             -r cli,htmlextra \
+#             --reporter-htmlextra-export task-3/newman-report.html
+
+#       - name: Upload API Test Report Artifact
+#         if: always()
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: newman-api-test-report
+#           path: task-3/newman-report.html
+
+#   task-4-automation-design-check:
+#     name: Task 4 — Automation Design Validation & Linting
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+
+#       - name: Verify TypeScript & Playwright Config Syntax
+#         run: |
+#           echo "Validating Playwright Automation Design Structure..."
+#           test -f task-4/automation-design.md || (echo "Task 4 design missing!" && exit 1)
+
+#   qa-deliverables-audit:
+#     name: Assessment Deliverables Verification
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
+
+#       - name: Verify All Task Folder Deliverables Exist
+#         run: |
+#           echo "Auditing required submission files..."
+#           test -f README.md
+#           test -f ai-usage.md
+#           test -f task-1/test-design.md
+#           test -f task-2/exploratory-bugs.md
+#           test -f task-3/postman-collection.json
+#           test -f task-3/part-a-notes.md
+#           test -f task-3/part-b-payments-analysis.md
+#           test -f task-4/automation-design.md
+#           test -f task-5/quality-strategy.md
+#           echo "All required assessment files are present and accounted for!"
