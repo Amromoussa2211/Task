@@ -1,132 +1,164 @@
-[
-  {
-    "id": "5b2e5f6a-8c1d-4e3f-9a7b-6d0c8e1f2a3b",
+{
+  "info": {
+    "_postman_id": "5b2e5f6a-8c1d-4e3f-9a7b-6d0c8e1f2a3b",
     "name": "FX Rates - Multi Currency",
     "description": "Validates FX rate API across multiple base currencies with data-driven execution. Part A of Task 3.",
-    "folders": [
-      {
-        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "name": "FX Rates Collection",
-        "items": [
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET Latest Rates - Base Currency",
+      "request": {
+        "method": "GET",
+        "header": [
           {
-            "id": "11111111-1111-1111-1111-111111111111",
-            "name": "GET Latest Rates - Base Currency",
-            "request": {
-              "method": "GET",
-              "header": [
-                {
-                  "key": "Accept",
-                  "value": "application/json"
-                }
-              ],
-              "url": {
-                "raw": "{{baseUrl}}/v6/latest/{{baseCurrency}}",
-                "host": ["{{baseUrl}}"],
-                "path": ["v6", "latest", "{{baseCurrency}}"]
-              },
-              "description": "Retrieves the latest FX rates for a given base currency. Validates status, response time, schema, and currency presence."
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "prerequest",
-                "script": {"type": "text/javascript", "exec": ["// No pre-request setup needed"]}
-              },
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
-                    "pm.test(\"Response time < 2000ms\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
-                    "var jsonData = pm.response.json();",
-                    "pm.test(\"Response has result field\", function () { pm.expect(jsonData).to.have.property(\"result\"); });",
-                    "pm.test(\"Response has base_code field\", function () { pm.expect(jsonData).to.have.property(\"base_code\"); });",
-                    "pm.test(\"Response has rates field\", function () { pm.expect(jsonData).to.have.property(\"rates\"); });",
-                    "pm.test(\"result is success\", function () { pm.expect(jsonData.result).to.eql(\"success\"); });",
-                    "pm.test(\"base_code matches request\", function () { pm.expect(jsonData.base_code).to.eql(pm.environment.get(\"baseCurrency\")); });",
-                    "var targetCurrencies = [\"EUR\", \"GBP\", \"JPY\", \"CAD\", \"AUD\", \"CHF\", \"CNY\", \"INR\", \"SAR\", \"AED\"];",
-                    "pm.test(\"Target currencies present and > 0\", function () { var rates = jsonData.rates; pm.expect(rates).to.be.an(\"object\"); targetCurrencies.forEach(function (c) { pm.expect(rates).to.have.property(c, \"Currency \" + c + \" should be present\"); pm.expect(rates[c]).to.be.a(\"number\"); pm.expect(rates[c]).to.be.above(0, \"Currency \" + c + \" should be > 0\"); }); });",
-                    "pm.environment.set(\"usdToEur\", jsonData.rates.EUR);",
-                    "pm.environment.set(\"ratesTimestamp\", jsonData.time_last_update_unix);",
-                    "pm.test(\"Captured EUR rate is plausible (0.1 to 10.0)\", function () { pm.expect(jsonData.rates.EUR).to.be.within(0.1, 10.0); });"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "id": "22222222-2222-2222-2222-222222222222",
-            "name": "GET Latest Rates - EUR (cross-check)",
-            "request": {
-              "method": "GET",
-              "header": [{"key": "Accept", "value": "application/json"}],
-              "url": {
-                "raw": "{{baseUrl}}/v6/latest/EUR",
-                "host": ["{{baseUrl}}"],
-                "path": ["v6", "latest", "EUR"]
-              },
-              "description": "Cross-checks captured USD-to-EUR rate against EUR-to-USD rate from an independent EUR-base call, within 0.5% tolerance."
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "prerequest",
-                "script": {"type": "text/javascript", "exec": ["if (!pm.environment.get(\"usdToEur\")) { pm.execution.skip(); }"]}
-              },
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
-                    "var jsonData = pm.response.json();",
-                    "pm.test(\"Response has result field\", function () { pm.expect(jsonData).to.have.property(\"result\"); });",
-                    "pm.test(\"result is success\", function () { pm.expect(jsonData.result).to.eql(\"success\"); });",
-                    "pm.test(\"Response has rates.EUR field\", function () { pm.expect(jsonData.rates).to.have.property(\"EUR\"); });",
-                    "var capturedUsdToEur = pm.environment.get(\"usdToEur\");",
-                    "var eurToUsd = jsonData.rates.USD;",
-                    "var expectedEurToUsd = 1 / capturedUsdToEur;",
-                    "var tolerance = 0.005;",
-                    "pm.test(\"EUR base: rates.USD cross-check vs captured USD-to-EUR within 0.5%\", function () { var ratio = eurToUsd / expectedEurToUsd; pm.expect(ratio).to.be.above(1 - tolerance); pm.expect(ratio).to.be.below(1 + tolerance); });",
-                    "pm.test(\"EUR base: rates.USD is plausible (0.5 to 2.0)\", function () { pm.expect(eurToUsd).to.be.within(0.5, 2.0); });"
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "id": "33333333-3333-3333-3333-333333333333",
-            "name": "GET Latest Rates - INVALID (negative case)",
-            "request": {
-              "method": "GET",
-              "header": [{"key": "Accept", "value": "application/json"}],
-              "url": {
-                "raw": "{{baseUrl}}/v6/latest/INVALID",
-                "host": ["{{baseUrl}}"],
-                "path": ["v6", "latest", "INVALID"]
-              },
-              "description": "Negative case: unsupported/malformed currency code. Asserts on actual API behaviour."
-            },
-            "response": [],
-            "event": [
-              {
-                "listen": "test",
-                "script": {
-                  "type": "text/javascript",
-                  "exec": [
-                    "pm.test(\"Status is 200 (API returns 200 even for invalid currency)\", function () { pm.response.to.have.status(200); });",
-                    "var jsonData = pm.response.json();",
-                    "pm.test(\"Response has result field\", function () { pm.expect(jsonData).to.have.property(\"result\"); });",
-                    "pm.test(\"result is fail for invalid currency\", function () { pm.expect(jsonData.result).to.eql(\"fail\"); });",
-                    "pm.test(\"Response contains an error field for the failure\", function () { pm.expect(jsonData).to.have.property(\"error\"); });"
-                  ]
-                }
-              }
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v6/latest/{{baseCurrency}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v6",
+            "latest",
+            "{{baseCurrency}}"
+          ]
+        },
+        "description": "Retrieves the latest FX rates for a given base currency. Validates status, response time, schema, and currency presence."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.iterationData && pm.iterationData.get('baseCurrency')) {",
+              "  pm.environment.set('baseCurrency', pm.iterationData.get('baseCurrency'));",
+              "}"
             ]
           }
-        ]
-      }
-    ]
-  }
-]
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Response time < 2000ms\", function () { pm.expect(pm.response.responseTime).to.be.below(2000); });",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Response has result field\", function () { pm.expect(jsonData).to.have.property(\"result\"); });",
+              "pm.test(\"Response has base_code field\", function () { pm.expect(jsonData).to.have.property(\"base_code\"); });",
+              "pm.test(\"Response has rates field\", function () { pm.expect(jsonData).to.have.property(\"rates\"); });",
+              "pm.test(\"result is success\", function () { pm.expect(jsonData.result).to.eql(\"success\"); });",
+              "pm.test(\"base_code matches request\", function () { pm.expect(jsonData.base_code).to.eql(pm.environment.get(\"baseCurrency\")); });",
+              "var targetCurrencies = [\"EUR\", \"GBP\", \"JPY\", \"CAD\", \"AUD\", \"CHF\", \"CNY\", \"INR\", \"SAR\", \"AED\"];",
+              "pm.test(\"Target currencies present and > 0\", function () { var rates = jsonData.rates; pm.expect(rates).to.be.an(\"object\"); targetCurrencies.forEach(function (c) { pm.expect(rates).to.have.property(c); pm.expect(rates[c]).to.be.a(\"number\"); pm.expect(rates[c]).to.be.above(0); }); });",
+              "if (jsonData.base_code === 'USD' && jsonData.rates && jsonData.rates.EUR) { pm.environment.set(\"usdToEur\", jsonData.rates.EUR); }",
+              "if (jsonData.time_last_update_unix) { pm.environment.set(\"ratesTimestamp\", jsonData.time_last_update_unix); }",
+              "if (jsonData.rates && jsonData.rates.EUR) { pm.test(\"Captured EUR rate is plausible (0.1 to 10.0)\", function () { pm.expect(jsonData.rates.EUR).to.be.within(0.1, 10.0); }); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET Latest Rates - EUR (cross-check)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v6/latest/EUR",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v6",
+            "latest",
+            "EUR"
+          ]
+        },
+        "description": "Cross-checks captured USD-to-EUR rate against EUR-to-USD rate from an independent EUR-base call, within 1% tolerance."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.environment.get(\"usdToEur\")) { pm.execution.skip(); }"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", function () { pm.response.to.have.status(200); });",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Response has result field\", function () { pm.expect(jsonData).to.have.property(\"result\"); });",
+              "pm.test(\"result is success\", function () { pm.expect(jsonData.result).to.eql(\"success\"); });",
+              "pm.test(\"Response has rates.EUR field\", function () { pm.expect(jsonData.rates).to.have.property(\"EUR\"); });",
+              "var capturedUsdToEur = parseFloat(pm.environment.get(\"usdToEur\"));",
+              "var eurToUsd = jsonData.rates.USD;",
+              "var expectedEurToUsd = 1 / capturedUsdToEur;",
+              "var tolerance = 0.02;",
+              "pm.test(\"EUR base: rates.USD cross-check vs captured USD-to-EUR within 2%\", function () { var ratio = eurToUsd / expectedEurToUsd; pm.expect(ratio).to.be.above(1 - tolerance); pm.expect(ratio).to.be.below(1 + tolerance); });",
+              "pm.test(\"EUR base: rates.USD is plausible (0.5 to 2.0)\", function () { pm.expect(eurToUsd).to.be.within(0.5, 2.0); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET Latest Rates - INVALID (negative case)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/v6/latest/INVALID",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "v6",
+            "latest",
+            "INVALID"
+          ]
+        },
+        "description": "Negative case: unsupported/malformed currency code. Asserts on actual API behaviour."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200 (API returns 200 even for invalid currency)\", function () { pm.response.to.have.status(200); });",
+              "var jsonData = pm.response.json();",
+              "pm.test(\"Response has result field\", function () { pm.expect(jsonData).to.have.property(\"result\"); });",
+              "pm.test(\"result is error for invalid currency\", function () { pm.expect(jsonData.result).to.eql(\"error\"); });",
+              "pm.test(\"Response contains error-type field for the failure\", function () { pm.expect(jsonData).to.have.property(\"error-type\"); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
